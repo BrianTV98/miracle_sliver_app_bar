@@ -1,16 +1,13 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/rendering.dart';
-
 
 class MiracleSliverHeaderDelegate extends SliverPersistentHeaderDelegate {
-
-
   @override
   final TickerProvider vsync;
 
   MiracleSliverHeaderDelegate({
+    this.extentMinHeight = 56,
     this.titleWidget,
-    required this.extentHeight,
+    required this.extentMaxHeight,
     required this.backgroundColor,
     required this.vsync,
     this.titleMaxFontWeight = FontWeight.w700,
@@ -23,12 +20,14 @@ class MiracleSliverHeaderDelegate extends SliverPersistentHeaderDelegate {
     this.styleHeadTitle = const TextStyle(fontSize: 14, color: Colors.white),
     this.title,
     this.titleScale = 0.8,
-    this.background,
+    this.child,
     this.actions,
     this.decoration,
   }) : super();
 
-  final double extentHeight;
+  final double extentMaxHeight;
+
+  final double extentMinHeight;
 
   /// chỉ sử dụng [titleWidget] hoặc title;
   @Deprecated('Không sử dụng cái này nữa')
@@ -62,17 +61,18 @@ class MiracleSliverHeaderDelegate extends SliverPersistentHeaderDelegate {
 
   final List<Widget>? actions;
 
-  final Widget? background;
+  final Widget Function(double)? child;
 
   final Decoration? decoration;
 
   @override
   Widget build(
-      BuildContext context,
-      double shrinkOffset,
-      bool overlapsContent,
-      ) {
-    return DecoratedBox(
+    BuildContext context,
+    double shrinkOffset,
+    bool overlapsContent,
+  ) {
+    return Container(
+      constraints: BoxConstraints(minHeight: MediaQuery.of(context).viewInsets.top + 56),
       decoration: decoration ??
           const BoxDecoration(
             gradient: LinearGradient(
@@ -82,81 +82,93 @@ class MiracleSliverHeaderDelegate extends SliverPersistentHeaderDelegate {
               colors: [Color(0xff0061F3), Color(0xff0055C2)],
             ),
           ),
-      child: SafeArea(
-        child: Stack(
-          children: [
-            Opacity(
-              opacity: 1 - shrinkOffset / extentHeight,
-              child: background,
+      child: Stack(
+        children: [
+          Opacity(
+            opacity:  1 - shrinkOffset / extentMaxHeight,
+            child: Image.network(
+              'https://nld.mediacdn.vn/zoom/216_133/291774122806476800/2023/10/28/1-1698467965635660644170.jpeg',
+              fit: BoxFit.fitWidth,
+              width: double.infinity,
             ),
-            // here provide actions
-            Align(
-              alignment: Alignment.topRight,
-              child: Padding(
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 16,
-                  vertical: 8,
-                ),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.end,
-                  children: actions ?? [],
-                ),
-              ),
-            ),
+          ),
 
-            Align(
-              alignment: Alignment.topLeft,
-              child: Padding(
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 16,
-                  vertical: 8,
-                ),
-                child: IconButton(
-                 icon: const Icon(Icons.arrow_back_ios_new_outlined),
-                  onPressed: () {
-                   bool canPop =  Navigator.of(context).canPop();
-                   if(canPop){
-                     Navigator.of(context).pop();
-                   }
-                  },
-                ),
-              ),
-            ),
+          SafeArea(
+            child: Stack(
+              children: [
 
-            Align(
-              alignment: Alignment(
-                shrinkOffset / extentHeight - 1,
-                1 - shrinkOffset / extentHeight,
-              ),
-              child: Padding(
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 16,
-                  vertical: 8,
+                // here provide actions
+                Align(
+                  alignment: Alignment.topRight,
+                  child: Padding(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 16,
+                      vertical: 8,
+                    ),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.end,
+                      children: actions ?? [],
+                    ),
+                  ),
                 ),
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    _buildHeadTitle(1 - shrinkOffset / extentHeight),
-                    _buildTitle(1 - shrinkOffset / extentHeight),
-                    _buildSubTitle(1 - shrinkOffset / extentHeight),
-                  ],
+
+                Align(
+                  alignment: Alignment.topLeft,
+                  child: Padding(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 16,
+                      vertical: 8,
+                    ),
+                    child: IconButton(
+                      icon: const Icon(Icons.arrow_back_ios_new_outlined),
+                      onPressed: () {
+                        bool canPop = Navigator.of(context).canPop();
+                        if (canPop) {
+                          Navigator.of(context).pop();
+                        }
+                      },
+                    ),
+                  ),
                 ),
-              ),
+
+                Align(
+                  alignment: Alignment(
+                    shrinkOffset / extentMaxHeight - 1,
+                    1 - shrinkOffset / extentMaxHeight,
+                  ),
+                  child: Padding(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 16,
+                      vertical: 8,
+                    ),
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        _buildHeadTitle(1 - shrinkOffset / extentMaxHeight),
+                        _buildTitle(1 - shrinkOffset / extentMaxHeight),
+                        _buildSubTitle(1 - shrinkOffset / extentMaxHeight),
+                      ],
+                    ),
+                  ),
+                ),
+              ],
             ),
-          ],
-        ),
+          ),
+          Opacity(
+            opacity: 1, //- shrinkOffset / extentMaxHeight,
+            child: child?.call(shrinkOffset / extentMaxHeight)?? const SizedBox(),
+          ),
+        ],
       ),
     );
   }
 
   Widget _buildTitle(double percent) {
     if (!(title?.isEmpty ?? true)) {
-      final fontWeight =
-      FontWeight.lerp(titleMinFontWeight, titleMaxFontWeight, percent);
+      final fontWeight = FontWeight.lerp(titleMinFontWeight, titleMaxFontWeight, percent);
 
-      final fontSize =
-          (maxTitleFontSize - minTitleFontSize) * percent + minTitleFontSize;
+      final fontSize = (maxTitleFontSize - minTitleFontSize) * percent + minTitleFontSize;
 
       return Text(
         title!,
@@ -169,27 +181,28 @@ class MiracleSliverHeaderDelegate extends SliverPersistentHeaderDelegate {
     }
 
     return Transform.scale(
-        scale: (1 - titleScale) * percent + titleScale,
-        child: titleWidget ?? const SizedBox.shrink());
+      scale: (1 - titleScale) * percent + titleScale,
+      child: titleWidget ?? const SizedBox.shrink(),
+    );
   }
 
   @override
-  double get maxExtent => extentHeight;
+  double get maxExtent => extentMaxHeight;
 
   @override
-  double get minExtent => kToolbarHeight;
+  double get minExtent => extentMinHeight;
 
   @override
   bool shouldRebuild(covariant MiracleSliverHeaderDelegate oldDelegate) {
     return oldDelegate != this;
   }
 
-  @override
-  FloatingHeaderSnapConfiguration get snapConfiguration =>
-      FloatingHeaderSnapConfiguration(
-        curve: Curves.linear,
-        duration: const Duration(milliseconds: 100),
-      );
+  // @override
+  // FloatingHeaderSnapConfiguration get snapConfiguration =>
+  //     FloatingHeaderSnapConfiguration(
+  //       curve: Curves.linear,
+  //       duration: const Duration(milliseconds: 100),
+  //     );
 
   _buildHeadTitle(double percent) {
     if (headTitle?.isEmpty ?? true) {
@@ -199,8 +212,7 @@ class MiracleSliverHeaderDelegate extends SliverPersistentHeaderDelegate {
       opacity: percent,
       child: Text(
         headTitle!,
-        style: styleHeadTitle.copyWith(
-            fontSize: styleHeadTitle.fontSize! * percent),
+        style: styleHeadTitle.copyWith(fontSize: styleHeadTitle.fontSize! * percent),
       ),
     );
   }
@@ -211,9 +223,7 @@ class MiracleSliverHeaderDelegate extends SliverPersistentHeaderDelegate {
     }
     return Opacity(
       opacity: percent,
-      child: Text(subTitle!,
-          style: styleSubTitle.copyWith(
-              fontSize: styleSubTitle.fontSize! * percent)),
+      child: Text(subTitle!, style: styleSubTitle.copyWith(fontSize: styleSubTitle.fontSize! * percent)),
     );
   }
 }

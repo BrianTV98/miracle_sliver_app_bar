@@ -1,11 +1,8 @@
-
-
-import 'dart:io';
-
+import 'package:arp_scanner/arp_scanner.dart';
 import 'package:flutter/material.dart';
 import 'package:miracle_sliver_app_bar/miracle_sliver_app_bar.dart';
 import 'package:public_ip_address/public_ip_address.dart';
-import 'package:arp_scanner/arp_scanner.dart';
+
 void main() {
   runApp(const MyApp());
 }
@@ -63,9 +60,9 @@ class MyHomePage extends StatefulWidget {
 class _MyHomePageState extends State<MyHomePage> with SingleTickerProviderStateMixin {
   int _counter = 0;
 
-  void _incrementCounter() async{
-   var reusult = await IpAddress.getAllDataFor("192.168.1.3");
-   await ArpScanner.scan();
+  void _incrementCounter() async {
+    var reusult = await IpAddress.getAllDataFor("192.168.1.3");
+    await ArpScanner.scan();
     setState(() {
       // This call to setState tells the Flutter framework that something has
       // changed in this State, which causes it to rerun the build method below
@@ -78,6 +75,57 @@ class _MyHomePageState extends State<MyHomePage> with SingleTickerProviderStateM
 
   @override
   Widget build(BuildContext context) {
+    // return  Scaffold(
+    //   body: CustomScrollView(
+    //     slivers: [
+    //       SliverAppBar(
+    //         expandedHeight: 350.0,
+    //         floating: false,
+    //         pinned: true,
+    //         flexibleSpace: FlexibleSpaceBar(
+    //           background: Container(
+    //             color: Colors.yellow,
+    //             child: const Center(child: Text('My Parallax Image!')),
+    //           ),
+    //         ),
+    //       ),
+    //       SliverToBoxAdapter(
+    //         child: Container(
+    //           height: 100,
+    //           color: Colors.blueAccent,
+    //           child: Stack(
+    //             children: [
+    //               Align(
+    //                 alignment: const Alignment(0.0, -2.0),
+    //                 child: Container(
+    //                   width: 50,
+    //                   height: 50,
+    //                   decoration: const BoxDecoration(
+    //                     shape: BoxShape.circle,
+    //                     color: Colors.red,
+    //                   ),
+    //                   child: const Center(child: Text('Red')),
+    //                 ),
+    //               ),
+    //             ],
+    //           ),
+    //         ),
+    //       ),
+    //       SliverList(
+    //         delegate: SliverChildBuilderDelegate(
+    //               (BuildContext context, int index) {
+    //             return Container(
+    //               height: 50,
+    //               color: Colors.teal[100 * ((index % 8) + 1)],
+    //               child: Center(child: Text('Item #$index')),
+    //             );
+    //           },
+    //           childCount: 20,
+    //         ),
+    //       ),
+    //     ],
+    //   ),
+    // );
 
     return Scaffold(
       body: NestedScrollView(
@@ -88,29 +136,41 @@ class _MyHomePageState extends State<MyHomePage> with SingleTickerProviderStateM
               floating: true,
               delegate: MiracleSliverHeaderDelegate(
                 vsync: this,
-                extentHeight: 150,
-                actions: [
-                  const Icon(Icons.add)
-                ],
+                extentMaxHeight: 200,
+                extentMinHeight: MediaQuery.of(context).padding.top + 56,
+                actions: [const Icon(Icons.add)],
                 titleScale: 16 / 24,
-                background: Align(
-                  alignment: Alignment.topRight,
-                  child: Padding(
-                    padding: const EdgeInsets.only(right: 56),
-                    child: Image.network(
-                        'https://nld.mediacdn.vn/zoom/216_133/291774122806476800/2023/10/28/1-1698467965635660644170.jpeg'),
+                child:(value)=> Align(
+                  alignment: Alignment.bottomCenter,
+                  child: Transform.translate(
+                    offset: const Offset(0,25),
+                    child: UnconstrainedBox(
+                      child: Container(
+                        decoration: BoxDecoration(color: Colors.greenAccent, borderRadius: BorderRadius.circular(100)),
+                        height: 50,
+                        width: 50,
+                        child: Center(child: Text(value.toStringAsPrecision(2).toString())),
+                      ),
+                    ),
                   ),
                 ),
                 backgroundColor: Colors.red,
-                title: ' Title',
-                titleWidget: const Text(
-                    'This is title'
-                ),
+                title: '',
+                // titleWidget: const Text('This is title'),
               ),
             ),
           ];
-        }, body: Column(children: [
-      ],),
+        },
+        body: ListView.builder(
+            itemCount: 20,
+            padding: EdgeInsets.zero,
+            itemBuilder: (context, index) {
+              return Container(
+                height: 100,
+                color: (index % 2 == 0) ? Colors.red : Colors.yellow,
+                child: Center(child: Text('$index')),
+              );
+            }),
       ),
       floatingActionButton: FloatingActionButton(
         onPressed: _incrementCounter,
