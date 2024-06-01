@@ -1,4 +1,6 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/widgets.dart';
 
 class MiracleSliverHeaderDelegate extends SliverPersistentHeaderDelegate {
   @override
@@ -85,42 +87,134 @@ class MiracleSliverHeaderDelegate extends SliverPersistentHeaderDelegate {
       child: Stack(
         children: [
           Opacity(
-            opacity:  1 - shrinkOffset / extentMaxHeight,
+            opacity: 1 - shrinkOffset / extentMaxHeight,
             child: Image.network(
               'https://nld.mediacdn.vn/zoom/216_133/291774122806476800/2023/10/28/1-1698467965635660644170.jpeg',
               fit: BoxFit.fitWidth,
               width: double.infinity,
             ),
           ),
-
           SafeArea(
             child: Stack(
               children: [
-
                 // here provide actions
                 Align(
-                  alignment: Alignment.topRight,
-                  child: Padding(
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: 16,
-                      vertical: 8,
-                    ),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.end,
-                      children: actions ?? [],
+                  alignment: Alignment.bottomLeft,
+                  child: UnconstrainedBox(
+                    child: Container(
+                      margin: EdgeInsets.only(
+                        left: 28 + 28 * (shrinkOffset / extentMaxHeight),
+                        right: 16 + 114 * (shrinkOffset / extentMaxHeight),
+                      ),
+                      width:
+                          MediaQuery.of(context).size.width - 28 - 16 - (114 + 28) * (shrinkOffset / extentMaxHeight),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        mainAxisSize: MainAxisSize.max,
+                        children: [
+                          Container(
+                            height: 40,
+                            width: 40,
+                            decoration: BoxDecoration(color: Colors.red, borderRadius: BorderRadius.circular(8)),
+                            child: const Center(
+                                child: Icon(
+                              Icons.access_time_filled,
+                              color: Colors.white,
+                            )),
+                          ),
+                          GestureDetector(
+                            onTap: (){
+                              print('1');
+                            },
+                            child: Container(
+                              height: 40,
+                              width: 40,
+                              decoration: BoxDecoration(color: Colors.red, borderRadius: BorderRadius.circular(8)),
+                              child: const Center(
+                                  child: Icon(
+                                Icons.ad_units,
+                                color: Colors.white,
+                              )),
+                            ),
+                          ),
+                          GestureDetector(
+                            onTap: (){
+                              print('2');
+                            },
+                            child: Container(
+                              height: 40,
+                              width: 40,
+                              decoration: BoxDecoration(
+                                color: Colors.red,
+                                borderRadius: BorderRadius.circular(8),
+                              ),
+                              child: const Center(
+                                child: Icon(
+                                  Icons.ad_units,
+                                  color: Colors.white,
+                                ),
+                              ),
+                            ),
+                          ),
+                          GestureDetector(
+                            onTap: (){
+                              print('3');
+                            },
+                            child: Container(
+                              height: 40,
+                              width: 40,
+                              decoration: BoxDecoration(color: Colors.red, borderRadius: BorderRadius.circular(8)),
+                              child: const Center(
+                                child: Icon(
+                                  Icons.ad_units,
+                                  color: Colors.white,
+                                ),
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
                     ),
                   ),
                 ),
-
+                Align(
+                  alignment: Alignment.topRight,
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      GestureDetector(
+                        onTap: (){
+                          print('3');
+                        },
+                        child: Container(
+                          height: 40,
+                          width: 40,
+                          decoration: BoxDecoration(color: Colors.red, borderRadius: BorderRadius.circular(8)),
+                          child: const Center(child: Text('A')),
+                        ),
+                      ),
+                      const SizedBox(width: 16),
+                      Container(
+                        height: 40,
+                        width: 40,
+                        decoration: BoxDecoration(color: Colors.red, borderRadius: BorderRadius.circular(8)),
+                        child: const Center(child: Text('A')),
+                      ),
+                      const SizedBox(width: 16),
+                    ],
+                  ),
+                ),
                 Align(
                   alignment: Alignment.topLeft,
                   child: Padding(
                     padding: const EdgeInsets.symmetric(
-                      horizontal: 16,
-                      vertical: 8,
+                      horizontal: 0,
+                      vertical: 0,
                     ),
                     child: IconButton(
                       icon: const Icon(Icons.arrow_back_ios_new_outlined),
+                      color: Colors.white,
                       onPressed: () {
                         bool canPop = Navigator.of(context).canPop();
                         if (canPop) {
@@ -157,7 +251,7 @@ class MiracleSliverHeaderDelegate extends SliverPersistentHeaderDelegate {
           ),
           Opacity(
             opacity: 1, //- shrinkOffset / extentMaxHeight,
-            child: child?.call(shrinkOffset / extentMaxHeight)?? const SizedBox(),
+            child: child?.call(shrinkOffset / extentMaxHeight) ?? const SizedBox(),
           ),
         ],
       ),
